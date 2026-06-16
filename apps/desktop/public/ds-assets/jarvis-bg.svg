@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1600" viewBox="0 0 2400 1600">
+  <defs>
+    <radialGradient id="core" cx="72%" cy="36%" r="58%">
+      <stop offset="0" stop-color="#7ddfff" stop-opacity="0.95"/>
+      <stop offset="0.22" stop-color="#1aa7ff" stop-opacity="0.55"/>
+      <stop offset="0.52" stop-color="#3c2bd7" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#050914" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="violet" cx="18%" cy="82%" r="54%">
+      <stop offset="0" stop-color="#9b7cff" stop-opacity="0.52"/>
+      <stop offset="0.44" stop-color="#5b43ff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#050914" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="scan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00e5ff" stop-opacity="0"/>
+      <stop offset="0.48" stop-color="#00e5ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#b7f7ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#7ddfff" stroke-opacity="0.075" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="2400" height="1600" fill="#050914"/>
+  <rect width="2400" height="1600" fill="url(#grid)"/>
+  <rect width="2400" height="1600" fill="url(#core)"/>
+  <rect width="2400" height="1600" fill="url(#violet)"/>
+  <g opacity="0.42" filter="url(#softGlow)" fill="none">
+    <circle cx="1700" cy="575" r="220" stroke="#89f7ff" stroke-opacity="0.42" stroke-width="4"/>
+    <circle cx="1700" cy="575" r="360" stroke="#43d9ff" stroke-opacity="0.24" stroke-width="3"/>
+    <circle cx="1700" cy="575" r="520" stroke="#887cff" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M290 1210C690 775 1040 604 1662 590c192-4 337-35 478-116" stroke="#9ff6ff" stroke-opacity="0.34" stroke-width="8" stroke-linecap="round"/>
+    <path d="M338 312c325 252 670 376 1036 370 256-4 458 46 684 177" stroke="#7c5cff" stroke-opacity="0.22" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.46">
+    <path d="M0 1050h520l126-126h360l94-94h282" stroke="#55eaff" stroke-opacity="0.22" stroke-width="2" fill="none"/>
+    <path d="M2400 268h-420l-92 92h-292l-130 130h-420" stroke="#b69cff" stroke-opacity="0.2" stroke-width="2" fill="none"/>
+    <path d="M0 520h310l72 72h218l96-96h296" stroke="#55eaff" stroke-opacity="0.16" stroke-width="2" fill="none"/>
+  </g>
+  <rect x="-400" y="-220" width="3200" height="340" fill="url(#scan)" transform="rotate(-18 1200 800)" opacity="0.54"/>
+  <g fill="#d8fbff" opacity="0.7">
+    <circle cx="1712" cy="574" r="6"/>
+    <circle cx="2016" cy="426" r="4"/>
+    <circle cx="1505" cy="844" r="3"/>
+    <circle cx="640" cy="1018" r="4"/>
+    <circle cx="374" cy="592" r="3"/>
+  </g>
+  <rect width="2400" height="1600" fill="#02040a" opacity="0.28"/>
+</svg>

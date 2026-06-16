@@ -1,0 +1,35 @@
+# Dependencies / build outputs
+node_modules/
+.venv/
+venv/
+dist/
+build/
+release/
+apps/desktop/node_modules/
+apps/desktop/dist/
+apps/desktop/build/
+apps/desktop/release/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local secrets / auth / profiles
+.env
+.env.*
+config.yaml
+config.yml
+google_token.json
+google_client_secret.json
+*.key
+*.pem
+*.p12
+*.log
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
