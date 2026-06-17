@@ -27,14 +27,15 @@ const {
 } = require('./update-remote.cjs')
 
 test('canonicalGitHubRemote normalizes SSH and HTTPS forms to the same value', () => {
-  assert.equal(canonicalGitHubRemote('git@github.com:NousResearch/hermes-agent.git'), OFFICIAL_REPO_CANONICAL)
-  assert.equal(canonicalGitHubRemote('git@github.com:NousResearch/hermes-agent'), OFFICIAL_REPO_CANONICAL)
-  assert.equal(canonicalGitHubRemote('ssh://git@github.com/NousResearch/hermes-agent.git'), OFFICIAL_REPO_CANONICAL)
-  assert.equal(canonicalGitHubRemote('https://github.com/NousResearch/hermes-agent.git'), OFFICIAL_REPO_CANONICAL)
+  const canonical = 'github.com/nousresearch/hermes-agent'
+  assert.equal(canonicalGitHubRemote('git@github.com:NousResearch/hermes-agent.git'), canonical)
+  assert.equal(canonicalGitHubRemote('git@github.com:NousResearch/hermes-agent'), canonical)
+  assert.equal(canonicalGitHubRemote('ssh://git@github.com/NousResearch/hermes-agent.git'), canonical)
+  assert.equal(canonicalGitHubRemote('https://github.com/NousResearch/hermes-agent.git'), canonical)
   // Case-insensitive: an uppercased owner still canonicalizes to the same repo.
-  assert.equal(canonicalGitHubRemote('git@github.com:nousresearch/hermes-agent.git'), OFFICIAL_REPO_CANONICAL)
+  assert.equal(canonicalGitHubRemote('git@github.com:nousresearch/hermes-agent.git'), canonical)
   // Trailing slashes are stripped.
-  assert.equal(canonicalGitHubRemote('https://github.com/NousResearch/hermes-agent/'), OFFICIAL_REPO_CANONICAL)
+  assert.equal(canonicalGitHubRemote('https://github.com/NousResearch/hermes-agent/'), canonical)
 })
 
 test('canonicalGitHubRemote is empty for falsy input', () => {
@@ -51,12 +52,13 @@ test('isSshRemote detects scp-like and ssh:// forms only', () => {
   assert.equal(isSshRemote(null), false)
 })
 
-test('isOfficialSshRemote is true only for the official repo over SSH', () => {
-  assert.equal(isOfficialSshRemote('git@github.com:NousResearch/hermes-agent.git'), true)
-  assert.equal(isOfficialSshRemote('git@github.com:NousResearch/hermes-agent'), true)
-  assert.equal(isOfficialSshRemote('ssh://git@github.com/NousResearch/hermes-agent.git'), true)
-  // Case-insensitive owner/repo match.
-  assert.equal(isOfficialSshRemote('git@github.com:nousresearch/hermes-agent.git'), true)
+test('isOfficialSshRemote is disabled for Jarvis branded builds', () => {
+  assert.equal(OFFICIAL_REPO_HTTPS_URL, '')
+  assert.equal(OFFICIAL_REPO_CANONICAL, '')
+  assert.equal(isOfficialSshRemote('git@github.com:NousResearch/hermes-agent.git'), false)
+  assert.equal(isOfficialSshRemote('git@github.com:NousResearch/hermes-agent'), false)
+  assert.equal(isOfficialSshRemote('ssh://git@github.com/NousResearch/hermes-agent.git'), false)
+  assert.equal(isOfficialSshRemote('git@github.com:nousresearch/hermes-agent.git'), false)
 })
 
 test('isOfficialSshRemote does NOT match forks, other hosts, or HTTPS', () => {

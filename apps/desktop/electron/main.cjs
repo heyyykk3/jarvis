@@ -120,6 +120,9 @@ const IS_MAC = process.platform === 'darwin'
 const IS_WINDOWS = process.platform === 'win32'
 const IS_WSL = isWslEnvironment()
 const APP_ROOT = app.getAppPath()
+const APP_NAME = 'Jarvis'
+const IS_PACKAGED_STANDALONE_JARVIS =
+  IS_PACKAGED && APP_NAME.toLowerCase() === 'jarvis' && process.env.JARVIS_USE_SHARED_HERMES_HOME !== '1'
 
 function hiddenWindowsChildOptions(options = {}) {
   if (!IS_WINDOWS || Object.prototype.hasOwnProperty.call(options, 'windowsHide')) {
@@ -242,6 +245,11 @@ if (INSTALL_STAMP) {
 // HERMES_HOME beneath the throwaway userData dir so a fresh-install run never
 // touches the user's real ~/.hermes / %LOCALAPPDATA%\hermes.
 function resolveHermesHome() {
+  if (process.env.JARVIS_HOME) return normalizeHermesHomeRoot(process.env.JARVIS_HOME)
+  if (IS_PACKAGED_STANDALONE_JARVIS) {
+    if (IS_WINDOWS && process.env.LOCALAPPDATA) return path.join(process.env.LOCALAPPDATA, 'Jarvis', 'agent-home')
+    return path.join(app.getPath('home'), '.jarvis')
+  }
   if (process.env.HERMES_HOME) return normalizeHermesHomeRoot(process.env.HERMES_HOME)
   if (USER_DATA_OVERRIDE) return path.join(path.resolve(USER_DATA_OVERRIDE), 'hermes-home')
   if (IS_WINDOWS) {
@@ -333,7 +341,6 @@ const BOOT_FAKE_STEP_MS = (() => {
   if (!Number.isFinite(raw) || raw <= 0) return 650
   return Math.max(120, raw)
 })()
-const APP_NAME = 'Hermes'
 const TITLEBAR_HEIGHT = 34
 const MACOS_TRAFFIC_LIGHTS_HEIGHT = 14
 const WINDOW_BUTTON_POSITION = {
@@ -2370,7 +2377,14 @@ function resolveHermesBackend(dashboardArgs) {
   //    do NOT write a bootstrap marker; the user did this themselves and we
   //    don't want to take ownership of an install we didn't perform.
   //    HERMES_DESKTOP_IGNORE_EXISTING=1 forces the bootstrap path for testing.
-  if (process.env.HERMES_DESKTOP_IGNORE_EXISTING !== '1') {
+  const allowExistingHermesCli =
+    process.env.HERMES_DESKTOP_IGNORE_EXISTING !== '1' &&
+    (
+      !IS_PACKAGED_STANDALONE_JARVIS ||
+      process.env.HERMES_DESKTOP_HERMES ||
+      process.env.JARVIS_USE_EXISTING_HERMES_CLI === '1'
+    )
+  if (allowExistingHermesCli) {
     let hermesCommand = null
     const hermesOverride = process.env.HERMES_DESKTOP_HERMES
 
@@ -2418,12 +2432,19 @@ function resolveHermesBackend(dashboardArgs) {
         `Ignoring existing Hermes CLI at ${hermesCommand}: --version probe failed; falling through to bootstrap.`
       )
     }
+  } else if (IS_PACKAGED_STANDALONE_JARVIS) {
+    rememberLog(
+      'Standalone Jarvis build is ignoring existing Hermes CLI entries on PATH; ' +
+        'set JARVIS_USE_EXISTING_HERMES_CLI=1 or HERMES_DESKTOP_HERMES to override.'
+    )
   }
 
   // 5. Last-ditch: pip-installed hermes_cli module via system Python.
   //    Same rationale as #4 -- the user installed this; we use it but don't
   //    take ownership.
-  const python = findSystemPython()
+  const python = !IS_PACKAGED_STANDALONE_JARVIS || process.env.JARVIS_USE_EXISTING_HERMES_CLI === '1'
+    ? findSystemPython()
+    : null
   if (python) {
     // Same smoke-test rationale as step 4: a system Python in the
     // SUPPORTED_VERSIONS range can be registered (PEP 514) without
@@ -2445,6 +2466,10 @@ function resolveHermesBackend(dashboardArgs) {
       }
     }
     rememberLog(`Ignoring system Python ${python}: hermes_cli is not importable; falling through to bootstrap.`)
+  } else if (IS_PACKAGED_STANDALONE_JARVIS) {
+    rememberLog(
+      'Standalone Jarvis build is ignoring globally installed hermes_cli modules; bootstrapping the pinned runtime instead.'
+    )
   }
 
   // 6. Nothing usable yet -- signal the bootstrap runner that we need to

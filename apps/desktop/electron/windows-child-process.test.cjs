@@ -17,8 +17,8 @@ function requireHiddenChildOptions(source, needle) {
   const snippet = source.slice(index, index + 700)
   assert.match(
     snippet,
-    /hiddenWindowsChildOptions\(/,
-    `expected ${needle} to wrap child-process options with hiddenWindowsChildOptions`
+    /hiddenWindowsChildOptions\(|windowsHide:\s*true/,
+    `expected ${needle} to hide Windows child-process consoles`
   )
 }
 
@@ -28,14 +28,14 @@ test('desktop background child processes opt into hidden Windows consoles', () =
   assert.match(source, /function hiddenWindowsChildOptions\(options = \{\}\)/)
 
   requireHiddenChildOptions(source, "execFileSync(\n          'reg'")
-  requireHiddenChildOptions(source, 'execFileSync(pyExe')
-  requireHiddenChildOptions(source, 'spawn(resolveGitBinary()')
+  requireHiddenChildOptions(source, 'execFileSync(\n          pyExe')
+  requireHiddenChildOptions(source, 'spawn(\n      resolveGitBinary()')
   requireHiddenChildOptions(source, "execFileSync('taskkill'")
-  requireHiddenChildOptions(source, 'spawn(command, args')
   requireHiddenChildOptions(source, "spawn('curl'")
-  requireHiddenChildOptions(source, 'spawn(backend.command, backend.args')
-  requireHiddenChildOptions(source, 'hermesProcess = spawn(backend.command, backend.args')
-  requireHiddenChildOptions(source, "spawn(py, ['-m', 'hermes_cli.main', 'uninstall', '--gui-summary']")
+  requireHiddenChildOptions(source, 'spawn(\n    backend.command,\n    backend.args')
+  requireHiddenChildOptions(source, 'hermesProcess = spawn(\n      backend.command,\n      backend.args')
+  requireHiddenChildOptions(source, "spawn(\n        py,\n        ['-m', 'hermes_cli.main', 'uninstall', '--gui-summary']")
+  requireHiddenChildOptions(source, 'spawn(runner, runnerArgs')
 })
 
 test('intentional or interactive desktop child processes stay documented', () => {
