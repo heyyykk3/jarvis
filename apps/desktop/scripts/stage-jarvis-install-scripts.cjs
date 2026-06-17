@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 /*
- * Stage Jarvis-branded first-launch installer scripts without hardcoded links
- * to the upstream Hermes repository. These copies are packaged as resources so
- * the desktop app never displays or contacts the Hermes main repo by default.
- *
- * If a future Jarvis-hosted repo/update location is created, point the staged
- * scripts at that location here instead of reintroducing upstream Hermes URLs.
+ * Stage Jarvis-branded first-launch installer scripts that point at the Jarvis
+ * repo. These copies are packaged as resources so the desktop app never
+ * displays or contacts the Hermes main repo by default.
  */
 const fs = require('node:fs')
 const path = require('node:path')
@@ -14,11 +11,16 @@ const desktopRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(desktopRoot, '..', '..')
 const outDir = path.join(desktopRoot, 'build', 'jarvis-install-scripts')
 
+const JARVIS_REPO_SSH = 'git@github.com:heyyykk3/jarvis.git'
+const JARVIS_REPO_HTTPS = 'https://github.com/heyyykk3/jarvis.git'
+const JARVIS_ARCHIVE_BASE = 'https://github.com/heyyykk3/jarvis/archive'
+const JARVIS_RAW_BASE = 'https://raw.githubusercontent.com/heyyykk3/jarvis'
+
 const replacements = [
-  [/git@github\.com:NousResearch\/hermes-agent\.git/g, ''],
-  [/https:\/\/github\.com\/NousResearch\/hermes-agent\.git/g, ''],
-  [/https:\/\/github\.com\/NousResearch\/hermes-agent\/archive/g, 'jarvis-disabled://archive'],
-  [/https:\/\/raw\.githubusercontent\.com\/NousResearch\/hermes-agent/g, 'jarvis-disabled://raw'],
+  [/git@github\.com:NousResearch\/hermes-agent\.git/g, JARVIS_REPO_SSH],
+  [/https:\/\/github\.com\/NousResearch\/hermes-agent\.git/g, JARVIS_REPO_HTTPS],
+  [/https:\/\/github\.com\/NousResearch\/hermes-agent\/archive/g, JARVIS_ARCHIVE_BASE],
+  [/https:\/\/raw\.githubusercontent\.com\/NousResearch\/hermes-agent/g, JARVIS_RAW_BASE],
   [/Hermes Desktop/g, 'Jarvis Desktop'],
   [/Hermes Agent/g, 'Jarvis Agent']
 ]

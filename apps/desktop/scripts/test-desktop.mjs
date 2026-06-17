@@ -287,6 +287,7 @@ function launchFresh() {
 //   - The Hermes Agent Python payload is NOT shipped (it's fetched at first
 //     launch via install.ps1's stage protocol).
 //   - install-stamp.json IS shipped in resources/ with a valid commit + branch.
+//   - Jarvis-branded install scripts ARE shipped with usable Jarvis repo URLs.
 //   - native-deps/@homebridge/node-pty-prebuilt-multiarch/ IS shipped with
 //     the package.json + lib/ + at least one .node binary (the renderer's
 //     integrated terminal needs this; see Phase 1F.6).
@@ -323,6 +324,30 @@ function validateBundle() {
   }
   if (!stamp.branch || typeof stamp.branch !== 'string') {
     die(`install-stamp.json is missing the branch field: ${JSON.stringify(stamp)}`)
+  }
+
+  // Positive assertion: the first-launch bootstrap scripts point at Jarvis.
+  // An empty clone URL fails as "does not appear to be a git repository", and
+  // a disabled archive URL fails before the agent install can start.
+  const installScriptsDir = path.join(APP.resourcesPath, 'jarvis-install-scripts')
+  for (const scriptName of ['install.sh', 'install.ps1']) {
+    const scriptPath = path.join(installScriptsDir, scriptName)
+    if (!exists(scriptPath)) {
+      die(`Missing Jarvis install script: ${scriptPath}`)
+    }
+    const scriptText = fs.readFileSync(scriptPath, 'utf8')
+    for (const expected of [
+      'git@github.com:heyyykk3/jarvis.git',
+      'https://github.com/heyyykk3/jarvis.git',
+      'https://github.com/heyyykk3/jarvis/archive'
+    ]) {
+      if (!scriptText.includes(expected)) {
+        die(`Jarvis install script ${scriptName} is missing expected repo URL: ${expected}`)
+      }
+    }
+    if (/jarvis-disabled:\/\/|NousResearch\/hermes-agent/.test(scriptText)) {
+      die(`Jarvis install script ${scriptName} still contains disabled or upstream Hermes repo URLs`)
+    }
   }
 
   // Positive assertion: node-pty native deps shipped
