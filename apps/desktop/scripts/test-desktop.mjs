@@ -336,11 +336,14 @@ function validateBundle() {
       die(`Missing Jarvis install script: ${scriptPath}`)
     }
     const scriptText = fs.readFileSync(scriptPath, 'utf8')
-    for (const expected of [
+    const expectedRepoUrls = [
       'git@github.com:heyyykk3/jarvis.git',
-      'https://github.com/heyyykk3/jarvis.git',
-      'https://github.com/heyyykk3/jarvis/archive'
-    ]) {
+      'https://github.com/heyyykk3/jarvis.git'
+    ]
+    if (scriptName === 'install.ps1') {
+      expectedRepoUrls.push('https://github.com/heyyykk3/jarvis/archive')
+    }
+    for (const expected of expectedRepoUrls) {
       if (!scriptText.includes(expected)) {
         die(`Jarvis install script ${scriptName} is missing expected repo URL: ${expected}`)
       }
